@@ -21,6 +21,9 @@ jobs:
       packages: write
       id-token: write
 
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -83,11 +86,11 @@ jobs:
 
       - name: Pull Docker image
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.image_tag }}
 
       - name: Run Docker container in background
         run: |
-          docker run -d -p 5000:5000 --name test-container ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker run -d -p 5000:5000 --name test-container ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.image_tag }}
           sleep 5
 
       - name: Set up Python
